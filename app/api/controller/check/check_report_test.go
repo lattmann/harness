@@ -213,3 +213,88 @@ func Test_getStartedTime(t *testing.T) {
 		})
 	}
 }
+
+func Test_getEndTime(t *testing.T) {
+	type args struct {
+		in  *ReportInput
+		now int64
+	}
+	tests := []struct {
+		name string
+		args args
+		want int64
+	}{
+		{
+			name: "pending",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusPending},
+				now: 1234,
+			},
+			want: 0,
+		},
+		{
+			name: "running",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusRunning},
+				now: 1234,
+			},
+			want: 0,
+		},
+		{
+			name: "success",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusSuccess},
+				now: 1234,
+			},
+			want: 1234,
+		},
+		{
+			name: "failure",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusFailure},
+				now: 1234,
+			},
+			want: 1234,
+		},
+		{
+			name: "error",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusError},
+				now: 1234,
+			},
+			want: 1234,
+		},
+		{
+			name: "ended",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusSuccess, Ended: 4321},
+				now: 1234,
+			},
+			want: 4321,
+		},
+		{
+			name: "ended zero",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusSuccess, Ended: 0},
+				now: 1234,
+			},
+			want: 1234,
+		},
+		{
+			name: "ended negative",
+			args: args{
+				in:  &ReportInput{Status: enum.CheckStatusSuccess, Ended: -1},
+				now: 1234,
+			},
+			want: -1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getEndTime(tt.args.in, tt.args.now); got != tt.want {
+				t.Errorf("getEndTime() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
