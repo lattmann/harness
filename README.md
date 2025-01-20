@@ -43,6 +43,11 @@ For more information on Drone, please visit [drone.io](https://www.drone.io/).
 
 Install the latest stable version of Node and Go version 1.20 or higher, and then install the below Go programs. Ensure the GOPATH [bin directory](https://go.dev/doc/gopath_code#GOPATH) is added to your PATH.
 
+Install yarn
+```bash
+npm install --global yarn
+```
+
 Install protobuf
 - Check if you've already installed protobuf ```protoc --version```
 - If your version is different than v3.21.11, run ```brew unlink protobuf```
