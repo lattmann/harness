@@ -3,23 +3,13 @@
 echo Running pre-commit hook
 
 # Check for required binaries, otherwise don't run
-if ! command -v grep &> /dev/null
-then
-    echo "grep could not be found - skipping pre-commit"
-    exit 0
-fi
-
-if ! command -v sed &> /dev/null
-then
-    echo "sed could not be found - skipping pre-commit"
-    exit 0
-fi
-
-if ! command -v xargs &> /dev/null
-then
-    echo "xargs could not be found - skipping pre-commit"
-    exit 0
-fi
+for cmd in grep sed xargs; do
+    if ! command -v "$cmd" &> /dev/null
+    then
+        echo "$cmd could not be found - skipping pre-commit"
+        exit 0
+    fi
+done
 
 # Run pre-commit, this checks if we changed any golang files and runs the checks.
 # The files are then git-added
