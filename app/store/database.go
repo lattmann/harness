@@ -20,6 +20,7 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/harness/gitness/git/sha"
 	"github.com/harness/gitness/types"
 	"github.com/harness/gitness/types/enum"
@@ -1295,5 +1296,31 @@ type (
 			start int64,
 			end int64,
 		) ([]types.UsageMetric, error)
+	}
+
+	SplitWorkspaceStore interface {
+		// Find(ctx context.Context, id uuid.UUID) (*types.SplitWorkspace, error)
+		Create(ctx context.Context, workspace *types.SplitWorkspace) error
+		// Update(ctx context.Context, workspace *types.SplitWorkspace) error
+		// Delete(ctx context.Context, id uuid.UUID) error
+	}
+
+	SplitEnvironmentStore interface {
+		Find(ctx context.Context, id uuid.UUID) (*types.SplitEnvironment, error)
+		Create(ctx context.Context, environment *types.SplitEnvironment) error
+		Update(ctx context.Context, environment *types.SplitEnvironment) error
+		Delete(ctx context.Context, id uuid.UUID) error
+	}
+
+	SplitTrafficTypeStore interface {
+		Find(ctx context.Context, id uuid.UUID) (*types.SplitTrafficType, error)
+		Create(ctx context.Context, trafficType *types.SplitTrafficType) error
+		Delete(ctx context.Context, id uuid.UUID) error
+	}
+
+	SplitSegmentStore interface {
+		Find(ctx context.Context, id uuid.UUID) (*types.SplitSegment, error)
+		Create(ctx context.Context, segment *types.SplitSegment) error
+		Delete(ctx context.Context, id uuid.UUID) error
 	}
 )

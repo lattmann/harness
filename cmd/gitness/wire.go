@@ -42,6 +42,7 @@ import (
 	"github.com/harness/gitness/app/api/controller/service"
 	"github.com/harness/gitness/app/api/controller/serviceaccount"
 	"github.com/harness/gitness/app/api/controller/space"
+	"github.com/harness/gitness/app/api/controller/split"
 	"github.com/harness/gitness/app/api/controller/system"
 	"github.com/harness/gitness/app/api/controller/template"
 	controllertrigger "github.com/harness/gitness/app/api/controller/trigger"
@@ -258,6 +259,7 @@ func initSystem(ctx context.Context, config *types.Config) (*cliserver.System, e
 		ssh.WireSet,
 		publickey.WireSet,
 		migrate.WireSet,
+		split.WireSet,
 		scm.WireSet,
 		platformconnector.WireSet,
 		gitspacesecret.WireSet,

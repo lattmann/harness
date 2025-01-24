@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-
 	aiagent2 "github.com/harness/gitness/app/api/controller/aiagent"
 	capabilities2 "github.com/harness/gitness/app/api/controller/capabilities"
 	check2 "github.com/harness/gitness/app/api/controller/check"
@@ -31,6 +30,7 @@ import (
 	"github.com/harness/gitness/app/api/controller/service"
 	"github.com/harness/gitness/app/api/controller/serviceaccount"
 	"github.com/harness/gitness/app/api/controller/space"
+	"github.com/harness/gitness/app/api/controller/split"
 	"github.com/harness/gitness/app/api/controller/system"
 	"github.com/harness/gitness/app/api/controller/template"
 	"github.com/harness/gitness/app/api/controller/trigger"
@@ -134,9 +134,10 @@ import (
 	"github.com/harness/gitness/store/database/dbtx"
 	"github.com/harness/gitness/types"
 	"github.com/harness/gitness/types/check"
+)
 
+import (
 	_ "github.com/lib/pq"
-
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -431,6 +432,8 @@ func initSystem(ctx context.Context, config *types.Config) (*server.System, erro
 	migrateWebhook := migrate.ProvideWebhookImporter(webhookConfig, transactor, webhookStore)
 	migrateLabel := migrate.ProvideLabelImporter(transactor, labelStore, labelValueStore, spaceStore)
 	migrateController := migrate2.ProvideController(authorizer, publicaccessService, gitInterface, provider, pullReq, rule, migrateWebhook, migrateLabel, resourceLimiter, auditService, repoIdentifier, transactor, spaceStore, repoStore, spaceCache, repoFinder)
+	splitWorkspaceStore := database.ProvideSplitWorkspaceStore(db)
+	splitController := split.ProvideController(authorizer, auditService, transactor, splitWorkspaceStore)
 	registry, err := capabilities.ProvideCapabilities()
 	if err != nil {
 		return nil, err
@@ -489,7 +492,7 @@ func initSystem(ctx context.Context, config *types.Config) (*server.System, erro
 	handler2 := router.MavenHandlerProvider(mavenHandler)
 	appRouter := router.AppRouterProvider(registryOCIHandler, apiHandler, handler2)
 	sender := usage.ProvideMediator(ctx, config, spaceStore, usageMetricStore)
-	routerRouter := router2.ProvideRouter(ctx, config, authenticator, repoController, reposettingsController, executionController, logsController, spaceController, pipelineController, secretController, triggerController, connectorController, templateController, pluginController, pullreqController, webhookController, githookController, gitInterface, serviceaccountController, controller, principalController, usergroupController, checkController, systemController, uploadController, keywordsearchController, infraproviderController, gitspaceController, migrateController, aiagentController, capabilitiesController, provider, openapiService, appRouter, sender)
+	routerRouter := router2.ProvideRouter(ctx, config, authenticator, repoController, reposettingsController, executionController, logsController, spaceController, pipelineController, secretController, triggerController, connectorController, templateController, pluginController, pullreqController, webhookController, githookController, gitInterface, serviceaccountController, controller, principalController, usergroupController, checkController, systemController, uploadController, keywordsearchController, infraproviderController, gitspaceController, migrateController, splitController, aiagentController, capabilitiesController, provider, openapiService, appRouter, sender)
 	serverServer := server2.ProvideServer(config, routerRouter)
 	publickeyService := publickey.ProvidePublicKey(publicKeyStore, principalInfoCache)
 	sshServer := ssh.ProvideServer(config, publickeyService, repoController)

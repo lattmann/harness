@@ -38,6 +38,7 @@ import (
 	"github.com/harness/gitness/app/api/controller/secret"
 	"github.com/harness/gitness/app/api/controller/serviceaccount"
 	"github.com/harness/gitness/app/api/controller/space"
+	"github.com/harness/gitness/app/api/controller/split"
 	"github.com/harness/gitness/app/api/controller/system"
 	"github.com/harness/gitness/app/api/controller/template"
 	"github.com/harness/gitness/app/api/controller/trigger"
@@ -108,6 +109,7 @@ func ProvideRouter(
 	infraProviderCtrl *infraprovider.Controller,
 	gitspaceCtrl *gitspace.Controller,
 	migrateCtrl *migrate.Controller,
+	splitCtrl *split.Controller,
 	aiagentCtrl *aiagent.Controller,
 	capabilitiesCtrl *capabilities.Controller,
 	urlProvider url.Provider,
@@ -133,7 +135,7 @@ func ProvideRouter(
 		authenticator, repoCtrl, repoSettingsCtrl, executionCtrl, logCtrl, spaceCtrl, pipelineCtrl,
 		secretCtrl, triggerCtrl, connectorCtrl, templateCtrl, pluginCtrl, pullreqCtrl, webhookCtrl,
 		githookCtrl, git, saCtrl, userCtrl, principalCtrl, userGroupCtrl, checkCtrl, sysCtrl, blobCtrl, searchCtrl,
-		infraProviderCtrl, migrateCtrl, gitspaceCtrl, aiagentCtrl, capabilitiesCtrl, usageSender)
+		infraProviderCtrl, migrateCtrl, splitCtrl, gitspaceCtrl, aiagentCtrl, capabilitiesCtrl, usageSender)
 	routers[2] = NewAPIRouter(apiHandler)
 
 	sec := NewSecure(config)

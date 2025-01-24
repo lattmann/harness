@@ -39,6 +39,7 @@ import (
 	"github.com/harness/gitness/app/api/controller/secret"
 	"github.com/harness/gitness/app/api/controller/serviceaccount"
 	"github.com/harness/gitness/app/api/controller/space"
+	"github.com/harness/gitness/app/api/controller/split"
 	"github.com/harness/gitness/app/api/controller/system"
 	"github.com/harness/gitness/app/api/controller/template"
 	"github.com/harness/gitness/app/api/controller/trigger"
@@ -68,6 +69,7 @@ import (
 	handlersecret "github.com/harness/gitness/app/api/handler/secret"
 	handlerserviceaccount "github.com/harness/gitness/app/api/handler/serviceaccount"
 	handlerspace "github.com/harness/gitness/app/api/handler/space"
+	handlersplit "github.com/harness/gitness/app/api/handler/split"
 	handlersystem "github.com/harness/gitness/app/api/handler/system"
 	handlertemplate "github.com/harness/gitness/app/api/handler/template"
 	handlertrigger "github.com/harness/gitness/app/api/handler/trigger"
@@ -134,6 +136,7 @@ func NewAPIHandler(
 	searchCtrl *keywordsearch.Controller,
 	infraProviderCtrl *infraprovider.Controller,
 	migrateCtrl *migrate.Controller,
+	splitCtrl *split.Controller,
 	gitspaceCtrl *gitspace.Controller,
 	aiagentCtrl *aiagent.Controller,
 	capabilitiesCtrl *capabilities.Controller,
@@ -170,7 +173,7 @@ func NewAPIHandler(
 			setupRoutesV1WithAuth(r, appCtx, config, repoCtrl, repoSettingsCtrl, executionCtrl, triggerCtrl, logCtrl,
 				pipelineCtrl, connectorCtrl, templateCtrl, pluginCtrl, secretCtrl, spaceCtrl, pullreqCtrl,
 				webhookCtrl, githookCtrl, git, saCtrl, userCtrl, principalCtrl, userGroupCtrl, checkCtrl, uploadCtrl,
-				searchCtrl, gitspaceCtrl, infraProviderCtrl, migrateCtrl, aiagentCtrl, capabilitiesCtrl, usageSender)
+				searchCtrl, gitspaceCtrl, infraProviderCtrl, migrateCtrl, splitCtrl, aiagentCtrl, capabilitiesCtrl, usageSender)
 		})
 	})
 
@@ -220,6 +223,7 @@ func setupRoutesV1WithAuth(r chi.Router,
 	gitspaceCtrl *gitspace.Controller,
 	infraProviderCtrl *infraprovider.Controller,
 	migrateCtrl *migrate.Controller,
+	splitCtrl *split.Controller,
 	aiagentCtrl *aiagent.Controller,
 	capabilitiesCtrl *capabilities.Controller,
 	usageSender usage.Sender,
@@ -242,6 +246,7 @@ func setupRoutesV1WithAuth(r chi.Router,
 	setupInfraProviders(r, infraProviderCtrl)
 	setupGitspaces(r, gitspaceCtrl)
 	setupMigrate(r, migrateCtrl)
+	setupSplit(r, splitCtrl)
 }
 
 // nolint: revive // it's the app context, it shouldn't be the first argument
@@ -945,6 +950,43 @@ func setupMigrate(r chi.Router, migCtrl *migrate.Controller) {
 				r.Post("/pullreqs", handlermigrate.HandlePullRequests(migCtrl))
 				r.Post("/webhooks", handlermigrate.HandleWebhooks(migCtrl))
 				r.Post("/rules", handlermigrate.HandleRules(migCtrl))
+			})
+		})
+	})
+}
+
+// func setupGitspaces(r chi.Router, gitspacesCtrl *gitspace.Controller) {
+// 	r.Route("/gitspaces", func(r chi.Router) {
+// 		r.Post("/lookup-repo", handlergitspace.HandleLookupRepo(gitspacesCtrl))
+// 		r.Post("/", handlergitspace.HandleCreateConfig(gitspacesCtrl))
+// 		r.Get("/", handlergitspace.HandleListAllGitspaces(gitspacesCtrl))
+// 		r.Route(fmt.Sprintf("/{%s}", request.PathParamGitspaceIdentifier), func(r chi.Router) {
+// 			r.Get("/", handlergitspace.HandleFind(gitspacesCtrl))
+// 			r.Post("/actions", handlergitspace.HandleAction(gitspacesCtrl))
+// 			r.Delete("/", handlergitspace.HandleDeleteConfig(gitspacesCtrl))
+// 			r.Patch("/", handlergitspace.HandleUpdateConfig(gitspacesCtrl))
+// 			r.Get("/events", handlergitspace.HandleEvents(gitspacesCtrl))
+// 			r.Get("/logs/stream", handlergitspace.HandleLogsStream(gitspacesCtrl))
+// 		})
+// 	})
+// }
+
+func setupSplit(r chi.Router, splitCtrl *split.Controller) {
+	r.Route("/split", func(r chi.Router) {
+		r.Route("/api", func(r chi.Router) {
+			r.Route("/v2", func(r chi.Router) {
+				r.Route("/workspaces", func(r chi.Router) {
+					r.Post("/", handlersplit.HandleCreateWorkspace(splitCtrl))
+				})
+				r.Route("/environments", func(r chi.Router) {
+					// r.Post("/", handlersplit.HandleCreate(splitCtrl))
+				})
+				r.Route("/traffic-types", func(r chi.Router) {
+					// r.Post("/", handlersplit.HandleCreate(splitCtrl))
+				})
+				r.Route("/segments", func(r chi.Router) {
+					// r.Post("/", handlersplit.HandleCreate(splitCtrl))
+				})
 			})
 		})
 	})
