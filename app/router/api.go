@@ -955,29 +955,19 @@ func setupMigrate(r chi.Router, migCtrl *migrate.Controller) {
 	})
 }
 
-// func setupGitspaces(r chi.Router, gitspacesCtrl *gitspace.Controller) {
-// 	r.Route("/gitspaces", func(r chi.Router) {
-// 		r.Post("/lookup-repo", handlergitspace.HandleLookupRepo(gitspacesCtrl))
-// 		r.Post("/", handlergitspace.HandleCreateConfig(gitspacesCtrl))
-// 		r.Get("/", handlergitspace.HandleListAllGitspaces(gitspacesCtrl))
-// 		r.Route(fmt.Sprintf("/{%s}", request.PathParamGitspaceIdentifier), func(r chi.Router) {
-// 			r.Get("/", handlergitspace.HandleFind(gitspacesCtrl))
-// 			r.Post("/actions", handlergitspace.HandleAction(gitspacesCtrl))
-// 			r.Delete("/", handlergitspace.HandleDeleteConfig(gitspacesCtrl))
-// 			r.Patch("/", handlergitspace.HandleUpdateConfig(gitspacesCtrl))
-// 			r.Get("/events", handlergitspace.HandleEvents(gitspacesCtrl))
-// 			r.Get("/logs/stream", handlergitspace.HandleLogsStream(gitspacesCtrl))
-// 		})
-// 	})
-// }
-
 func setupSplit(r chi.Router, splitCtrl *split.Controller) {
 	r.Route("/split", func(r chi.Router) {
+		// Interionally leave this end point open to all users e.g., /split/docs can return documentation
 		r.Route("/api", func(r chi.Router) {
+			// Restrict to authenticated users any api end points
+			r.Use(middlewareprincipal.RestrictTo(enum.PrincipalTypeUser))
+
 			r.Route("/v2", func(r chi.Router) {
 				r.Route("/workspaces", func(r chi.Router) {
 					r.Post("/", handlersplit.HandleCreateWorkspace(splitCtrl))
-					r.Get("/{id}", handlersplit.HandleGetWorkspace(splitCtrl))
+					r.Get("/{uuid}", handlersplit.HandleGetWorkspace(splitCtrl))
+					// r.Delete("/{id}", handlersplit.HandleDeleteWorkspace(splitCtrl))
+					// r.Patch("/{id}", handlersplit.HandleUpdateWorkspace(splitCtrl))
 				})
 				r.Route("/environments", func(r chi.Router) {
 					// r.Post("/", handlersplit.HandleCreate(splitCtrl))

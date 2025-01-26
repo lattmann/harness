@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	SplitUUIDParam = "id"
+	SplitUUIDParam = "uuid"
 )
 
 func GetUUIDParam(r *http.Request) (uuid.UUID, error) {
