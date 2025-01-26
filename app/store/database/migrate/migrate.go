@@ -77,7 +77,7 @@ func Current(ctx context.Context, db *sqlx.DB) (string, error) {
 		query = `
 			SELECT count(*)
 			FROM information_schema.tables
-			WHERE table_name = ? and table_schema = 'public'`
+			WHERE table_name = $1 and table_schema = 'public'`
 	default:
 		return "", fmt.Errorf("unsupported driver '%s'", db.DriverName())
 	}
