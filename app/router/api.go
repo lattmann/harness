@@ -977,6 +977,7 @@ func setupSplit(r chi.Router, splitCtrl *split.Controller) {
 			r.Route("/v2", func(r chi.Router) {
 				r.Route("/workspaces", func(r chi.Router) {
 					r.Post("/", handlersplit.HandleCreateWorkspace(splitCtrl))
+					r.Get("/{id}", handlersplit.HandleGetWorkspace(splitCtrl))
 				})
 				r.Route("/environments", func(r chi.Router) {
 					// r.Post("/", handlersplit.HandleCreate(splitCtrl))

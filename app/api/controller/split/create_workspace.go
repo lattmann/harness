@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/harness/gitness/app/auth"
 	"github.com/harness/gitness/types"
 )
@@ -82,4 +83,17 @@ func (c *Controller) sanitizeCreateInput(in *CreateWorkspaceInput) error {
 	// TODO: default value may need to be in config
 	in.RequiresTitleAndComments = in.RequiresTitleAndComments || true
 	return nil
+}
+
+func (c *Controller) GetWorkspace(
+	ctx context.Context,
+	session *auth.Session,
+	id uuid.UUID,
+) (*WorkspaceOutput, error) {
+	workspace, err := c.splitWorkspaceStore.Find(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find workspace: %w", err)
+	}
+
+	return &WorkspaceOutput{SplitWorkspace: *workspace}, nil
 }

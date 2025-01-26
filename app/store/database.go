@@ -1299,7 +1299,7 @@ type (
 	}
 
 	SplitWorkspaceStore interface {
-		// Find(ctx context.Context, id uuid.UUID) (*types.SplitWorkspace, error)
+		Find(ctx context.Context, id uuid.UUID) (*types.SplitWorkspace, error)
 		Create(ctx context.Context, workspace *types.SplitWorkspace) error
 		// Update(ctx context.Context, workspace *types.SplitWorkspace) error
 		// Delete(ctx context.Context, id uuid.UUID) error

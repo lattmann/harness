@@ -23,8 +23,10 @@ import (
 	"github.com/harness/gitness/store/database/dbtx"
 	"github.com/harness/gitness/types"
 	"github.com/jmoiron/sqlx"
+	"github.com/pkg/errors"
 )
 
+// SPLIT WORKSPACE STORE
 type SplitWorkspaceStore struct {
 	db *sqlx.DB
 }
@@ -87,6 +89,32 @@ func (s *SplitWorkspaceStore) Create(
 	return nil
 }
 
+// Find Finds a split workspace in the database.
+func (s *SplitWorkspaceStore) Find(
+	ctx context.Context,
+	id uuid.UUID,
+) (*types.SplitWorkspace, error) {
+
+	stmt := database.Builder.
+		Select(splitWorkspaceColumns).
+		From("split_workspaces").
+		Where("split_workspace_id = ?", id)
+
+	db := dbtx.GetAccessor(ctx, s.db)
+
+	dst := new(splitWorkspace)
+	sql, args, err := stmt.ToSql()
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to convert query to sql")
+	}
+
+	if err = db.GetContext(ctx, dst, sql, args...); err != nil {
+		return nil, database.ProcessSQLErrorf(ctx, err, "Failed to find split workspace")
+	}
+
+	return s.mapToSplitWorkspace(ctx, dst)
+}
+
 type splitWorkspace struct {
 	ID                       uuid.UUID `db:"split_workspace_id"`
 	Name                     string    `db:"split_workspace_name"`
@@ -104,3 +132,19 @@ func mapInternalSplitWorkspace(u *types.SplitWorkspace, splitWorkspaceID uuid.UU
 		Updated:                  u.Updated,
 	}
 }
+
+func (s *SplitWorkspaceStore) mapToSplitWorkspace(ctx context.Context, dst *splitWorkspace) (*types.SplitWorkspace, error) {
+	return &types.SplitWorkspace{
+		ID:                       dst.ID,
+		Name:                     dst.Name,
+		RequiresTitleAndComments: dst.RequiresTitleAndComments,
+		Created:                  dst.Created,
+		Updated:                  dst.Updated,
+	}, nil
+}
+
+// SPLIT ENVIRONMENT STORE
+
+// SPLIT TRAFFIC TYPE STORE
+
+// SPLIT SEGMENT STORE
