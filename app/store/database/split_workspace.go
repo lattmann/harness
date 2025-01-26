@@ -75,7 +75,7 @@ func (s *SplitWorkspaceStore) Create(
 
 	db := dbtx.GetAccessor(ctx, s.db)
 
-	query, arg, err := db.BindNamed(sqlQuery, workspace)
+	query, arg, err := db.BindNamed(sqlQuery, mapInternalSplitWorkspace(workspace, uuid.New()))
 	if err != nil {
 		return database.ProcessSQLErrorf(ctx, err, "Failed to bind split workspace object")
 	}
@@ -87,11 +87,20 @@ func (s *SplitWorkspaceStore) Create(
 	return nil
 }
 
-// func mapInternalSplitWorkspace(u *types.SplitWorkspace, splitWorkspaceID uuid.UUID) *SplitWorkspace {
-// 	return &SplitWorkspace{
-// 		ID:                       splitWorkspaceID,
-// 		RequiresTitleAndComments: u.RequiresTitleAndComments,
-// 		Created:                  u.Created,
-// 		Updated:                  u.Updated,
-// 	}
-// }
+type splitWorkspace struct {
+	ID                       uuid.UUID `db:"split_workspace_id"`
+	Name                     string    `db:"split_workspace_name"`
+	RequiresTitleAndComments bool      `db:"split_workspace_requires_title_and_comments"`
+	Created                  int64     `db:"split_workspace_created"`
+	Updated                  int64     `db:"split_workspace_updated"`
+}
+
+func mapInternalSplitWorkspace(u *types.SplitWorkspace, splitWorkspaceID uuid.UUID) *splitWorkspace {
+	return &splitWorkspace{
+		ID:                       splitWorkspaceID,
+		Name:                     u.Name,
+		RequiresTitleAndComments: u.RequiresTitleAndComments,
+		Created:                  u.Created,
+		Updated:                  u.Updated,
+	}
+}
